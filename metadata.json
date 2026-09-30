@@ -1,0 +1,6 @@
+{
+  "name": "Mallick Garments | Premium Men's Fashion Store in Bokaro",
+  "description": "Shop premium men's shirts, t-shirts, jeans, trousers, baggy jeans, oversized fashion and track pants at Mallick Garments, Bokaro Steel City.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
