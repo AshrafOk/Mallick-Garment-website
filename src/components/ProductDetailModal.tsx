@@ -14,6 +14,8 @@ import {
   Sparkles,
   ArrowRight,
   ZoomIn,
+  Flame,
+  Edit3,
 } from 'lucide-react';
 
 interface ProductDetailModalProps {
@@ -25,8 +27,16 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   product,
   onClose,
 }) => {
-  const { addToCart, toggleWishlist, isWishlisted, setSelectedProduct, setIsFitGuideOpen, showToast } =
-    useShop();
+  const {
+    addToCart,
+    toggleWishlist,
+    isWishlisted,
+    setSelectedProduct,
+    setIsFitGuideOpen,
+    showToast,
+    isAdminLoggedIn,
+    openAdminEditModal,
+  } = useShop();
 
   const [activeAngle, setActiveAngle] = useState<'front' | 'back' | 'side' | 'zoom'>('front');
   const [selectedSize, setSelectedSize] = useState<string>(product.availableSizes[0] || 'M');
@@ -66,8 +76,11 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   };
 
   const handleWhatsAppInquiry = () => {
+    const offerNotice = product.isWeekendOffer
+      ? `\n*🔥 Special Weekend Offer:* ${product.weekendOfferDetails?.offerTitle || 'Active Weekend Deal'}`
+      : '';
     const text = encodeURIComponent(
-      `Hello Mallick Garments Bokaro! 👋\nI am interested in:\n\n*Product:* ${product.name}\n*SKU:* ${product.sku}\n*Selected Size:* ${selectedSize}\n*Color:* ${selectedColor}\n\nIs this currently in stock at the Siwandih or Sector 4 outlet?`
+      `Hello Mallick Garments Bokaro! 👋\nI am inquiring about:\n\n*Product:* ${product.name}\n*SKU:* ${product.sku}\n*Selected Size:* ${selectedSize}\n*Color:* ${selectedColor}${offerNotice}\n\nIs this size and color available at the Siwandih or Sector 4 outlet?`
     );
     window.open(`https://wa.me/${STORE_INFO.whatsappRaw}?text=${text}`, '_blank');
   };
@@ -172,7 +185,39 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   <span className="text-xs text-zinc-400">
                     Complimentary In-Store Fitting & Alterations
                   </span>
+
+                  {isAdminLoggedIn && (
+                    <button
+                      onClick={() => openAdminEditModal(product)}
+                      className="px-3 py-1 bg-[#d4af37] hover:bg-amber-400 text-black font-extrabold text-xs uppercase tracking-wider rounded-full flex items-center gap-1.5 shadow transition-all cursor-pointer hover:scale-105"
+                      title="Edit this product image, details and offers"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Edit Product & Images</span>
+                    </button>
+                  )}
                 </div>
+
+                {/* Weekend Offer Highlight Banner */}
+                {product.isWeekendOffer && (
+                  <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-red-950/70 via-amber-950/40 to-zinc-900 border border-amber-500/50 shadow-lg animate-in fade-in duration-300">
+                    <div className="flex items-center gap-2 text-amber-300">
+                      <Flame className="w-4 h-4 text-red-400 animate-pulse" />
+                      <span className="text-xs font-extrabold uppercase tracking-wider">
+                        {product.weekendOfferDetails?.badge || 'WEEKEND SPECIAL OFFER'}
+                      </span>
+                    </div>
+                    <h4 className="text-sm font-bold text-white mt-1">
+                      {product.weekendOfferDetails?.offerTitle || 'Exclusive Weekend Offer Active'}
+                    </h4>
+                    <div className="flex flex-wrap items-center gap-3 mt-2 text-[11px] text-zinc-300">
+                      {product.weekendOfferDetails?.validUntil && (
+                        <span>⏰ Valid: {product.weekendOfferDetails.validUntil}</span>
+                      )}
+                      <span>📍 {product.weekendOfferDetails?.outletLocation || 'Both Bokaro Outlets'}</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Color Selection */}

@@ -17,6 +17,10 @@ import { CartDrawer } from './components/CartDrawer';
 import { WishlistDrawer } from './components/WishlistDrawer';
 import { FitGuideModal } from './components/FitGuideModal';
 import { SearchModal } from './components/SearchModal';
+import { AddProductModal } from './components/AddProductModal';
+import { AdminBar } from './components/AdminBar';
+import { AdminLoginModal } from './components/AdminLoginModal';
+import { AdminEditProductModal } from './components/AdminEditProductModal';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { Check } from 'lucide-react';
 
@@ -54,6 +58,9 @@ const MainLayout: React.FC = () => {
         </div>
       )}
 
+      {/* Admin Mode Bar for asharafalik1@gmail.com */}
+      <AdminBar />
+
       {/* Main Top Bar */}
       <Navbar />
 
@@ -82,6 +89,13 @@ const MainLayout: React.FC = () => {
 
       {/* Predictive Instant Search Modal */}
       <SearchModal />
+
+      {/* Product Creator & Weekend Offer Manager */}
+      <AddProductModal />
+
+      {/* Admin Modals */}
+      <AdminLoginModal />
+      <AdminEditProductModal />
 
       {/* Floating Concierge Action */}
       <FloatingWhatsApp />

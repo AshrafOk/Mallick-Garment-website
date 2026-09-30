@@ -21,16 +21,23 @@ import {
 } from 'lucide-react';
 
 export const HomePage: React.FC = () => {
-  const { navigateToShopWithFilter, setSelectedProduct, setActivePage } = useShop();
+  const {
+    products,
+    navigateToShopWithFilter,
+    setSelectedProduct,
+    setActivePage,
+    openAddProductModal,
+  } = useShop();
 
-  const latestArrivals = PRODUCTS.filter((p) => p.isNewArrival).slice(0, 4);
-  const bestSellers = PRODUCTS.filter((p) => p.isBestSeller).slice(0, 4);
-  const trendingFashion = PRODUCTS.filter((p) => p.isTrending).slice(0, 4);
+  const weekendOffers = products.filter((p) => p.isWeekendOffer);
+  const latestArrivals = products.filter((p) => p.isNewArrival).slice(0, 4);
+  const bestSellers = products.filter((p) => p.isBestSeller).slice(0, 4);
+  const trendingFashion = products.filter((p) => p.isTrending).slice(0, 4);
 
   // Spotlights for Baggy, Oversized, and Straight Fit
-  const baggyItems = PRODUCTS.filter((p) => p.fit === 'Baggy Fit').slice(0, 3);
-  const oversizedItems = PRODUCTS.filter((p) => p.fit === 'Oversized Fit').slice(0, 3);
-  const straightFitItems = PRODUCTS.filter((p) => p.fit === 'Straight Fit').slice(0, 3);
+  const baggyItems = products.filter((p) => p.fit === 'Baggy Fit').slice(0, 3);
+  const oversizedItems = products.filter((p) => p.fit === 'Oversized Fit').slice(0, 3);
+  const straightFitItems = products.filter((p) => p.fit === 'Straight Fit').slice(0, 3);
 
   const reviews = [
     {
@@ -183,6 +190,56 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* 1.5 WEEKEND SPECIAL OFFERS SHOWCASE */}
+      {weekendOffers.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-br from-red-950/40 via-amber-950/20 to-zinc-950 border border-amber-500/40 shadow-2xl relative overflow-hidden">
+            {/* Ambient Warm Glow */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-amber-500/20 gap-4 relative z-10">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/30 border border-red-500/40 text-amber-300 text-xs font-bold uppercase tracking-widest mb-2 animate-pulse">
+                  <Flame className="w-3.5 h-3.5 text-red-400" />
+                  <span>Limited Time · Weekend Offers</span>
+                </div>
+                <h2 className="font-editorial text-3xl md:text-5xl tracking-wide text-white mt-1">
+                  WEEKEND SPECIAL DEALS
+                </h2>
+                <p className="text-xs sm:text-sm text-zinc-300 mt-1 max-w-xl">
+                  Exclusive promotional offers across all sizes & color variants at our Bokaro flagship showrooms.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
+                <button
+                  onClick={() => openAddProductModal('offer')}
+                  className="px-4 py-2 bg-gradient-to-r from-red-600 to-amber-500 hover:from-red-500 hover:to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center gap-1.5 shadow-lg shadow-amber-500/10 cursor-pointer hover:scale-105"
+                >
+                  <Flame className="w-4 h-4 fill-black" />
+                  <span>+ Post Weekend Offer</span>
+                </button>
+
+                <button
+                  onClick={() => navigateToShopWithFilter({ weekendOffers: true })}
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-xs font-semibold uppercase tracking-wider rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>View All Offers ({weekendOffers.length})</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Grid of Weekend Offer Products */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+              {weekendOffers.slice(0, 4).map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 2. LATEST ARRIVALS */}
       <section className="max-w-7xl mx-auto px-4 md:px-8">

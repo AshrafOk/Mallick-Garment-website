@@ -5,6 +5,7 @@ import { Search, X, ArrowRight, Sparkles } from 'lucide-react';
 
 export const SearchModal: React.FC = () => {
   const {
+    products,
     isSearchOpen,
     setIsSearchOpen,
     setSelectedProduct,
@@ -25,7 +26,7 @@ export const SearchModal: React.FC = () => {
   if (!isSearchOpen) return null;
 
   const filteredProducts = term.trim()
-    ? PRODUCTS.filter((p) => {
+    ? products.filter((p) => {
         const query = term.toLowerCase();
         return (
           p.name.toLowerCase().includes(query) ||

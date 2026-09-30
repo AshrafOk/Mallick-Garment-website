@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import { Product } from '../data/products';
 import { useShop } from '../context/ShopContext';
-import { Heart, Eye, ShoppingBag } from 'lucide-react';
+import { Heart, Eye, ShoppingBag, Flame, Edit3 } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { setSelectedProduct, toggleWishlist, isWishlisted, addToCart } = useShop();
+  const {
+    setSelectedProduct,
+    toggleWishlist,
+    isWishlisted,
+    addToCart,
+    isAdminLoggedIn,
+    openAdminEditModal,
+  } = useShop();
   const [isHovered, setIsHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -58,14 +65,35 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Subtle Dark Vignette & Gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-black/20 pointer-events-none" />
 
+        {/* Admin Quick Edit Button - Available on EVERY product for asharafalik1@gmail.com */}
+        {isAdminLoggedIn && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openAdminEditModal(product);
+            }}
+            title="Change this product image, details or offer (Admin)"
+            className="absolute top-3 left-3 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#d4af37] hover:bg-amber-400 text-black font-extrabold text-[11px] uppercase tracking-wider shadow-2xl transition-all cursor-pointer hover:scale-105 border border-black/30"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+            <span>Edit Image</span>
+          </button>
+        )}
+
         {/* Top Badges / Indicators: Quiet inline text */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
-          {product.isNewArrival && (
+        <div className={`absolute ${isAdminLoggedIn ? 'top-12' : 'top-3'} left-3 flex flex-col gap-1 z-10`}>
+          {product.isWeekendOffer && (
+            <span className="text-[10px] uppercase tracking-wider font-extrabold text-amber-200 bg-red-600/95 backdrop-blur-md px-2.5 py-1 rounded shadow-lg flex items-center gap-1 border border-amber-400/40 animate-pulse">
+              <Flame className="w-3 h-3 text-amber-200" />
+              <span>{product.weekendOfferDetails?.badge || 'WEEKEND OFFER'}</span>
+            </span>
+          )}
+          {product.isNewArrival && !product.isWeekendOffer && (
             <span className="text-[10px] uppercase tracking-wider font-semibold text-[#d4af37] bg-black/70 backdrop-blur-md px-2 py-0.5 rounded">
               New Drop
             </span>
           )}
-          {product.isBestSeller && !product.isNewArrival && (
+          {product.isBestSeller && !product.isNewArrival && !product.isWeekendOffer && (
             <span className="text-[10px] uppercase tracking-wider font-semibold text-white bg-black/70 backdrop-blur-md px-2 py-0.5 rounded">
               Bokaro Favorite
             </span>
@@ -128,9 +156,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="flex items-center gap-1.5 text-xs text-zinc-300 font-medium">
             <span className="text-[#d4af37]">Sizes:</span>
             <span>
-              {product.parentCategory === 'shirts' || product.parentCategory === 'tshirts'
+              {product.availableSizes && product.availableSizes.length > 0
+                ? product.availableSizes.length <= 4
+                  ? product.availableSizes.join(', ')
+                  : `${product.availableSizes[0]} - ${product.availableSizes[product.availableSizes.length - 1]}`
+                : product.parentCategory === 'shirts' || product.parentCategory === 'tshirts'
                 ? 'S to 4XL'
-                : '28 to 48'}
+                : '28 to 44'}
             </span>
           </div>
 
@@ -151,6 +183,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             )}
           </div>
         </div>
+
+        {/* Weekend Special Deal Callout */}
+        {product.isWeekendOffer && product.weekendOfferDetails?.offerTitle && (
+          <div className="mt-2.5 px-2 py-1 rounded bg-gradient-to-r from-red-950/60 to-amber-950/40 border border-amber-500/30 text-[10px] text-amber-300 font-medium line-clamp-1 flex items-center gap-1">
+            <Flame className="w-2.5 h-2.5 text-red-400 flex-shrink-0" />
+            <span className="truncate">{product.weekendOfferDetails.offerTitle}</span>
+          </div>
+        )}
       </div>
     </div>
   );

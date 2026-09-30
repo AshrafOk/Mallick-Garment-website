@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 import { PRODUCTS, Product } from '../data/products';
-import { Sparkles, ArrowRight, Eye, Camera } from 'lucide-react';
+import { Sparkles, ArrowRight, Eye, Camera, Edit3 } from 'lucide-react';
 
 export const GalleryPage: React.FC = () => {
-  const { setSelectedProduct, navigateToShopWithFilter } = useShop();
+  const {
+    setSelectedProduct,
+    navigateToShopWithFilter,
+    isAdminLoggedIn,
+    openAdminEditModal,
+    products,
+  } = useShop();
 
   const [activeTab, setActiveTab] = useState<
     | 'all'
@@ -178,6 +184,20 @@ export const GalleryPage: React.FC = () => {
                   {item.categoryLabel}
                 </span>
               </div>
+
+              {isAdminLoggedIn && (
+                <button
+                  onClick={() => {
+                    const prod = products.find((p) => p.id === item.productId) || products[0];
+                    if (prod) openAdminEditModal(prod);
+                  }}
+                  title="Edit this lookbook image (Admin)"
+                  className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#d4af37] hover:bg-amber-400 text-black font-extrabold text-[11px] uppercase tracking-wider shadow-2xl transition-all cursor-pointer hover:scale-105"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit Image</span>
+                </button>
+              )}
             </div>
 
             <div className="p-6 flex flex-col justify-between flex-grow">

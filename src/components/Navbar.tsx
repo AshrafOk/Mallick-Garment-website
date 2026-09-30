@@ -13,6 +13,8 @@ import {
   Instagram,
   Youtube,
   Phone,
+  Flame,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -25,6 +27,10 @@ export const Navbar: React.FC = () => {
     setIsFitGuideOpen,
     activePage,
     setActivePage,
+    openAddProductModal,
+    isAdminLoggedIn,
+    adminEmail,
+    setIsAdminLoginModalOpen,
   } = useShop();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -176,6 +182,30 @@ export const Navbar: React.FC = () => {
               )}
             </button>
 
+            {/* Admin Portal Button */}
+            <button
+              onClick={() => setIsAdminLoginModalOpen(true)}
+              className={`p-2 rounded-full transition-colors cursor-pointer ${
+                isAdminLoggedIn
+                  ? 'text-[#d4af37] bg-[#d4af37]/15 hover:bg-[#d4af37]/25'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/5'
+              }`}
+              title={isAdminLoggedIn ? `Admin Active: ${adminEmail}` : 'Admin Portal (asharafalik1@gmail.com)'}
+              aria-label="Admin Portal"
+            >
+              <ShieldCheck className="w-5 h-5" />
+            </button>
+
+            {/* Post Weekend Offer / Product Button */}
+            <button
+              onClick={() => openAddProductModal('offer')}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 via-amber-500 to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg hover:scale-105 transition-all cursor-pointer border border-amber-300/40"
+              title="Post a Weekend Offer or Add Your Product"
+            >
+              <Flame className="w-3.5 h-3.5 fill-black" />
+              <span>Post Offer</span>
+            </button>
+
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -216,6 +246,17 @@ export const Navbar: React.FC = () => {
             ))}
 
             <div className="pt-6 border-t border-white/10 flex flex-col space-y-4">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openAddProductModal('offer');
+                }}
+                className="flex items-center justify-center gap-2.5 p-3 rounded-xl bg-gradient-to-r from-red-600 via-amber-500 to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider shadow-lg"
+              >
+                <Flame className="w-4 h-4 fill-black" />
+                <span>+ Post Weekend Offer / Add Product</span>
+              </button>
+
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);

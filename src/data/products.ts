@@ -25,6 +25,17 @@ export interface ColorVariant {
   hex: string;
 }
 
+export interface WeekendOfferDetails {
+  badge: string; // e.g. "WEEKEND COMBO", "WEEKEND SPECIAL", "BUY 2 GET 1"
+  offerType?: 'standard' | 'combo';
+  offerTitle: string; // e.g. "Special Weekend Offer on all sizes & colors"
+  comboItems?: string; // e.g. "2 Shirts + 1 Chino @ Special In-Store Combo Price"
+  validUntil?: string; // e.g. "Sunday Midnight"
+  highlightText?: string;
+  outletLocation?: string; // e.g. "Siwandih & Sector 4 Outlets"
+  discountPercent?: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -46,6 +57,8 @@ export interface Product {
   isBestSeller?: boolean;
   isNewArrival?: boolean;
   isTrending?: boolean;
+  isWeekendOffer?: boolean;
+  weekendOfferDetails?: WeekendOfferDetails;
   modelSpecs?: string;
 }
 
@@ -174,6 +187,14 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isTrending: true,
+    isWeekendOffer: true,
+    weekendOfferDetails: {
+      badge: 'WEEKEND SPECIAL',
+      offerTitle: 'Buy 2 Formal Shirts, Get 1 Bespoke Tie & Pocket Square Free',
+      validUntil: 'Sunday 10 PM',
+      highlightText: 'Valid on all sizes (S to 4XL) & all 3 luxury colors',
+      outletLocation: 'Both Siwandih & Sector 4 Outlets',
+    },
     modelSpecs: 'Model is 6\'1" wearing size L (Chest 40")',
   },
   {
@@ -568,6 +589,14 @@ export const PRODUCTS: Product[] = [
     isBestSeller: true,
     isNewArrival: true,
     isTrending: true,
+    isWeekendOffer: true,
+    weekendOfferDetails: {
+      badge: 'BUY 2 GET 1',
+      offerTitle: 'Weekend Special: Buy Any 2 Heavyweight 260 GSM Tees, Get 3rd Free',
+      validUntil: 'Sunday Midnight',
+      highlightText: 'Valid on all sizes (S to 4XL) and all 4 color variants',
+      outletLocation: 'Both Siwandih & Sector 4 Outlets',
+    },
     modelSpecs: 'Model is 6\'1" wearing size L (Authentic Oversized Fit)',
   },
 
@@ -752,6 +781,14 @@ export const PRODUCTS: Product[] = [
     isBestSeller: true,
     isNewArrival: true,
     isTrending: true,
+    isWeekendOffer: true,
+    weekendOfferDetails: {
+      badge: 'WEEKEND STEAL',
+      offerTitle: 'Weekend Special: Compliment Heavy Duty Skate Belt with Wide-Leg Denim',
+      validUntil: 'Sunday 11 PM',
+      highlightText: 'Available across all waist sizes (28 to 42) & 3 authentic vintage washes',
+      outletLocation: 'Both Siwandih & Sector 4 Outlets',
+    },
     modelSpecs: 'Model is 6\'0" wearing waist size 32 (Stacked Hem Look)',
   },
 
@@ -927,6 +964,14 @@ export const PRODUCTS: Product[] = [
       'Sleek tapered fit, coin pocket detail, and herringbone pocket linings. The ultimate smart-casual staple for office to dining.',
     washCare: ['Machine wash 30°C', 'Do not tumble dry', 'Iron warm'],
     isBestSeller: true,
+    isWeekendOffer: true,
+    weekendOfferDetails: {
+      badge: 'WEEKEND DEAL',
+      offerTitle: 'Smart Stretch Chino Weekend Offer: Compliment Real Leather Belt with 2 Chinos',
+      validUntil: 'Sunday 10 PM',
+      highlightText: 'Valid across all sizes (28 to 42) & 4 tailored colors',
+      outletLocation: 'Both Siwandih & Sector 4 Outlets',
+    },
     modelSpecs: 'Model is 6\'0" wearing waist size 32',
   },
 
@@ -1141,6 +1186,14 @@ export const PRODUCTS: Product[] = [
     washCare: ['Machine wash 30°C', 'Do not bleach', 'Do not dry clean'],
     isNewArrival: true,
     isTrending: true,
+    isWeekendOffer: true,
+    weekendOfferDetails: {
+      badge: 'WEEKEND SPECIAL',
+      offerTitle: 'Tactical Track Pants Weekend Deal: Buy Any Track Pant, Get DryFit Sports Socks Free',
+      validUntil: 'Sunday 10 PM',
+      highlightText: 'Valid on all sizes (28 to 42) & 3 tactical colors',
+      outletLocation: 'Both Siwandih & Sector 4 Outlets',
+    },
     modelSpecs: 'Model is 6\'0" wearing size M',
   },
 

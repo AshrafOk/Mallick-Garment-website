@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useShop } from '../context/ShopContext';
 import {
-  PRODUCTS,
   CATEGORIES_LIST,
   FitType,
   ParentCategory,
@@ -9,10 +8,11 @@ import {
   SHIRT_SIZES,
 } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
-import { Filter, X, SlidersHorizontal, ArrowUpDown, Search, Sparkles } from 'lucide-react';
+import { Filter, X, SlidersHorizontal, ArrowUpDown, Search, Sparkles, Flame, Plus } from 'lucide-react';
 
 export const ShopPage: React.FC = () => {
   const {
+    products,
     selectedCategoryFilter,
     setSelectedCategoryFilter,
     selectedFitFilter,
@@ -20,6 +20,9 @@ export const ShopPage: React.FC = () => {
     searchQuery,
     setSearchQuery,
     setIsFitGuideOpen,
+    showOnlyWeekendOffers,
+    setShowOnlyWeekendOffers,
+    openAddProductModal,
   } = useShop();
 
   const [selectedParentCategory, setSelectedParentCategory] = useState<string>('all');
@@ -52,57 +55,71 @@ export const ShopPage: React.FC = () => {
     setSelectedFitFilter('All');
     setSelectedSizeFilter('all');
     setSearchQuery('');
+    setShowOnlyWeekendOffers(false);
   };
 
+  const weekendOffersCount = useMemo(() => {
+    return products.filter((p) => p.isWeekendOffer).length;
+  }, [products]);
+
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
-      // 1. Search Query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesName = product.name.toLowerCase().includes(q);
-        const matchesCategory = product.category.toLowerCase().includes(q);
-        const matchesFit = product.fit.toLowerCase().includes(q);
-        const matchesFabric = product.fabric.toLowerCase().includes(q);
-        if (!matchesName && !matchesCategory && !matchesFit && !matchesFabric) {
+    return products
+      .filter((product) => {
+        // 1. Weekend Offers Only Toggle
+        if (showOnlyWeekendOffers && !product.isWeekendOffer) {
           return false;
         }
-      }
 
-      // 2. Parent Category
-      if (selectedParentCategory !== 'all') {
-        if (product.parentCategory !== selectedParentCategory) {
-          return false;
+        // 2. Search Query
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          const matchesName = product.name.toLowerCase().includes(q);
+          const matchesCategory = product.category.toLowerCase().includes(q);
+          const matchesFit = product.fit.toLowerCase().includes(q);
+          const matchesFabric = product.fabric.toLowerCase().includes(q);
+          if (!matchesName && !matchesCategory && !matchesFit && !matchesFabric) {
+            return false;
+          }
         }
-      }
 
-      // 3. Specific Category
-      if (selectedCategoryFilter !== 'All') {
-        if (product.category !== selectedCategoryFilter) {
-          return false;
+        // 3. Parent Category
+        if (selectedParentCategory !== 'all') {
+          if (product.parentCategory !== selectedParentCategory) {
+            return false;
+          }
         }
-      }
 
-      // 4. Fit Filter
-      if (selectedFitFilter !== 'All') {
-        if (product.fit !== selectedFitFilter) {
-          return false;
+        // 4. Specific Category
+        if (selectedCategoryFilter !== 'All') {
+          if (product.category !== selectedCategoryFilter) {
+            return false;
+          }
         }
-      }
 
-      // 5. Size Filter
-      if (selectedSizeFilter !== 'all') {
-        if (!product.availableSizes.includes(selectedSizeFilter)) {
-          return false;
+        // 5. Fit Filter
+        if (selectedFitFilter !== 'All') {
+          if (product.fit !== selectedFitFilter) {
+            return false;
+          }
         }
-      }
 
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === 'newest') return (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0);
-      if (sortBy === 'rating') return b.rating - a.rating;
-      return 0; // featured default
-    });
+        // 6. Size Filter
+        if (selectedSizeFilter !== 'all') {
+          if (!product.availableSizes?.includes(selectedSizeFilter)) {
+            return false;
+          }
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'newest') return (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0);
+        if (sortBy === 'rating') return b.rating - a.rating;
+        return 0; // featured default
+      });
   }, [
+    products,
+    showOnlyWeekendOffers,
     searchQuery,
     selectedParentCategory,
     selectedCategoryFilter,
@@ -116,66 +133,116 @@ export const ShopPage: React.FC = () => {
     selectedCategoryFilter !== 'All' ||
     selectedFitFilter !== 'All' ||
     selectedSizeFilter !== 'all' ||
+    showOnlyWeekendOffers ||
     searchQuery !== '';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
-      {/* Header Banner */}
-      <div className="border-b border-white/10 pb-8 mb-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold flex items-center gap-1.5">
-              <span>The Full Wardrobe Archive</span>
-              <span>·</span>
-              <span>Bokaro Steel City</span>
-            </div>
-            <h1 className="font-editorial text-4xl md:text-6xl text-white tracking-wide mt-1">
-              MEN'S COLLECTION
-            </h1>
-            <p className="text-xs md:text-sm text-zinc-400 mt-2 max-w-xl">
-              Discover all 26 garment categories tailored in premium cottons, raw selvedge denim, luxury linen, and technical activewear.
-            </p>
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 space-y-8">
+      {/* Page Title & Breadcrumb Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#d4af37] font-semibold">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Official Catalogue · Bokaro Flagship</span>
           </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsFitGuideOpen(true)}
-              className="text-xs uppercase tracking-wider text-zinc-300 hover:text-[#d4af37] border border-white/10 rounded-lg px-3.5 py-2.5 bg-zinc-950/80 transition-colors"
-            >
-              Interactive Sizing Guide
-            </button>
-            <button
-              onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
-              className="md:hidden flex items-center gap-2 text-xs uppercase tracking-wider text-white bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5"
-            >
-              <SlidersHorizontal className="w-4 h-4 text-[#d4af37]" />
-              <span>Filters</span>
-            </button>
-          </div>
+          <h1 className="font-editorial text-4xl sm:text-5xl md:text-6xl text-white tracking-wide mt-1">
+            MEN'S COLLECTION
+          </h1>
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-xl">
+            Browse our complete range of 26 menswear categories. Select any piece to view sizing, fabric specifications, color swatches, or reserve for in-store fitting.
+          </p>
         </div>
 
-        {/* Parent Category Tabs (Segmented control) */}
-        <div className="mt-8 flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
-          {parentCategories.map((cat) => (
+        {/* Action Controls */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => openAddProductModal('offer')}
+            className="px-4 py-2.5 bg-gradient-to-r from-red-600 via-amber-500 to-amber-400 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center gap-1.5 shadow-lg shadow-amber-500/10 hover:scale-105 cursor-pointer"
+          >
+            <Flame className="w-4 h-4 fill-black" />
+            <span>+ Post Offer / Product</span>
+          </button>
+
+          <button
+            onClick={() => setIsFitGuideOpen(true)}
+            className="px-4 py-2 bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 rounded-xl text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+          >
+            Fit & Size Guide
+          </button>
+
+          <button
+            onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
+            className="md:hidden px-4 py-2 bg-[#d4af37] text-black rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            <span>Filters ({hasActiveFilters ? 'Active' : 'All'})</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Top Filter Bar: Parent Categories & Weekend Deals Tab */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        {/* Weekend Special Deals Chip */}
+        <button
+          onClick={() => setShowOnlyWeekendOffers(!showOnlyWeekendOffers)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex-shrink-0 ${
+            showOnlyWeekendOffers
+              ? 'bg-gradient-to-r from-red-600 to-amber-500 text-black shadow-lg shadow-red-600/20 border border-amber-300'
+              : 'bg-red-950/40 text-amber-300 border border-amber-500/30 hover:border-amber-400'
+          }`}
+        >
+          <Flame className={`w-3.5 h-3.5 ${showOnlyWeekendOffers ? 'fill-black' : 'text-red-400'}`} />
+          <span>⚡ Weekend Offers ({weekendOffersCount})</span>
+        </button>
+
+        {parentCategories.map((cat) => {
+          const active = selectedParentCategory === cat.id && !showOnlyWeekendOffers;
+          return (
             <button
               key={cat.id}
               onClick={() => {
+                setShowOnlyWeekendOffers(false);
                 setSelectedParentCategory(cat.id);
                 setSelectedCategoryFilter('All');
               }}
-              className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider whitespace-nowrap rounded-lg border transition-all cursor-pointer ${
-                selectedParentCategory === cat.id
-                  ? 'bg-white text-black border-white shadow'
-                  : 'bg-zinc-950 text-zinc-400 border-white/10 hover:text-white hover:border-white/30'
+              className={`px-4 py-2 rounded-xl text-xs font-medium uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
+                active
+                  ? 'bg-white text-black font-semibold shadow-md'
+                  : 'bg-zinc-900/80 text-zinc-400 hover:text-white hover:bg-zinc-800 border border-white/5'
               }`}
             >
               {cat.label}
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
-      {/* Main Layout: Filters Sidebar (Desktop) + Product Grid */}
+      {/* Active Weekend Filter Alert Banner */}
+      {showOnlyWeekendOffers && (
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-red-950/60 via-amber-950/40 to-zinc-950 border border-amber-500/40 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold">
+              <Flame className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                Viewing Active Weekend Offers Only
+              </h4>
+              <p className="text-[11px] text-zinc-400 mt-0.5">
+                Special promotional deals applicable at both Siwandih & Sector 4 Bokaro showrooms.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowOnlyWeekendOffers(false)}
+            className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-xs text-white rounded-lg transition-colors font-semibold"
+          >
+            Show All Products
+          </button>
+        </div>
+      )}
+
+      {/* Main Catalog Viewport Layout */}
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-8">
         {/* Filters Sidebar */}
         <aside
@@ -191,7 +258,7 @@ export const ShopPage: React.FC = () => {
             {hasActiveFilters && (
               <button
                 onClick={resetAllFilters}
-                className="text-[11px] text-[#d4af37] hover:underline cursor-pointer"
+                className="text-[11px] text-[#d4af37] hover:underline cursor-pointer font-medium"
               >
                 Reset All
               </button>
@@ -301,6 +368,9 @@ export const ShopPage: React.FC = () => {
           <div className="flex items-center justify-between pb-4 border-b border-white/5 text-xs text-zinc-400">
             <div>
               Showing <span className="text-white font-bold">{filteredProducts.length}</span> luxury garments in Bokaro
+              {showOnlyWeekendOffers && (
+                <span className="text-amber-400 font-bold ml-1.5">(Weekend Offers Active)</span>
+              )}
             </div>
 
             <div className="flex items-center gap-2">
@@ -324,7 +394,7 @@ export const ShopPage: React.FC = () => {
                 No garments matched the selected filter criteria.
               </p>
               <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-                Try resetting your filters or switching silhouettes to discover more styles.
+                Try resetting your filters, turning off offer filter, or exploring different silhouettes.
               </p>
               <button
                 onClick={resetAllFilters}

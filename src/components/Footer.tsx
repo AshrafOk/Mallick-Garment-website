@@ -16,7 +16,12 @@ import {
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { navigateToShopWithFilter, setActivePage } = useShop();
+  const {
+    navigateToShopWithFilter,
+    setActivePage,
+    isAdminLoggedIn,
+    setIsAdminLoginModalOpen,
+  } = useShop();
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<string | null>(null);
 
@@ -324,6 +329,14 @@ export const Footer: React.FC = () => {
           >
             Instagram Lookbook
           </a>
+          <button
+            onClick={() => setIsAdminLoginModalOpen(true)}
+            className="text-zinc-500 hover:text-[#d4af37] transition-colors flex items-center gap-1 font-mono text-[11px] cursor-pointer"
+            title="Administrator Portal: asharafalik1@gmail.com"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-[#d4af37]" />
+            <span>{isAdminLoggedIn ? 'Admin Active' : 'Admin Portal'}</span>
+          </button>
         </div>
       </div>
     </footer>
